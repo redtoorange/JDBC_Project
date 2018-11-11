@@ -11,6 +11,8 @@ import javafx.scene.control.TextField;
 
 public class MainViewController {
     private AppState currentState = AppState.CLEAR;
+    private Employee currentEmployeeData;
+
     private ApplicationController controller;
     @FXML
     private TextField fNameField;
@@ -58,15 +60,44 @@ public class MainViewController {
      * @param event unused.
      */
     private void onSaveClicked(ActionEvent event) {
-        Employee newEmployeeData = null;
-        boolean validEmployee = false;
+        Employee newEmployeeData = getEmployeeFromFields();
 
-        // Attempt to populate an employee with the data from the local fields.
+        if (newEmployeeData != null) {
+            System.out.println( newEmployeeData );
+            System.out.println(currentEmployeeData);
+            if(currentEmployeeData.equals(newEmployeeData)){
+                displayMessage("No Changes", "Not Data Changes", "The data in the form has not been altered, ignoring save request.");
+                return;
+            }
+            else{
+                String result = Factory.saveEmployee(newEmployeeData);
+
+                switch (result) {
+                    case "SUCCESS":
+                        displayMessage("Success", "Data Saved Successfully", "Your data was successfully written to the database.  Revision number and fields have been updated.");
+                        onLoadClicked(null);
+                        break;
+                    case "REVNUM_ERROR":
+                        displayError("Revision Error", "Revision number mismatch from current DB revision number, updating local state.");
+                        onLoadClicked(null);
+                        break;
+                    default:
+                        displayError("Error Writing to DB", "Unhandled Error: " + result);
+                        onClearClicked(null);
+                        break;
+                }
+            }
+        }
+    }
+
+    private Employee getEmployeeFromFields() {
+        Employee employeeData = null;
+
         try {
-            newEmployeeData = new Employee(
+            employeeData = new Employee(
                     empIDField.getText(),
-                    fNameField.getText(),
                     lNameField.getText(),
+                    fNameField.getText(),
                     Integer.parseInt(salaryField.getText()),
                     streetField.getText(),
                     cityField.getText(),
@@ -74,7 +105,7 @@ public class MainViewController {
                     zipField.getText(),
                     Integer.parseInt(revNumField.getText())
             );
-            validEmployee = true;
+
         } catch (NumberFormatException nfe) {
             displayError("Not a Number", "Salary is not a valid number.");
         } catch (LengthException le) {
@@ -83,25 +114,7 @@ public class MainViewController {
             displayError("Unknown Error", "There has been an unknown error.  No changes will be written.");
         }
 
-        // Ensure that the loaded data is valid then attempt to write to the DB
-        if (validEmployee) {
-            String result = Factory.saveEmployee(newEmployeeData);
-
-            switch (result) {
-                case "SUCCESS":
-                    displayMessage("Success", "Data Saved Successfully", "Your data was successfully written to the database.  Revision number and fields have been updated.");
-                    onLoadClicked(null);
-                    break;
-                case "REVNUM_ERROR":
-                    displayError("Revision Error", "Revision number mismatch from current DB revision number, updating local state.");
-                    onLoadClicked(null);
-                    break;
-                default:
-                    displayError("Error Writing to DB", "Unhandled Error: " + result);
-                    onClearClicked(null);
-                    break;
-            }
-        }
+        return employeeData;
     }
 
     /**
@@ -112,9 +125,9 @@ public class MainViewController {
     private void onLoadClicked(ActionEvent event) {
         String text = empIDField.getText();
         if (!text.isEmpty()) {
-            Employee employee = Factory.getEmployee(text);
-            if (employee != null) {
-                displayEmployee(employee);
+            currentEmployeeData = Factory.getEmployee(text);
+            if (currentEmployeeData != null) {
+                displayEmployee(currentEmployeeData);
                 changeButtonState(AppState.LOADED);
             } else {
                 displayError("Employee Not Found", "There was an error locating the specified employee.");
@@ -132,6 +145,7 @@ public class MainViewController {
     private void onClearClicked(ActionEvent event) {
         changeButtonState(AppState.CLEAR);
 
+        currentEmployeeData = null;
         fNameField.setText("");
         lNameField.setText("");
         salaryField.setText("");

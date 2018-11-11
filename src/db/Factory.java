@@ -101,8 +101,8 @@ public class Factory {
      * @throws SQLException CallableStatement may throw an exception when setting variables.
      */
     private static void createUpdateCommand(Employee employee, CallableStatement statement) throws SQLException {
-        statement.setString(1, employee.getfName());
-        statement.setString(2, employee.getlName());
+        statement.setString(1, employee.getlName());
+        statement.setString(2, employee.getfName());
         statement.setInt(3, employee.getSalary());
         statement.setString(4, employee.getStreet());
         statement.setString(5, employee.getCity());

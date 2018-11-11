@@ -47,15 +47,15 @@ public class Employee {
         if (obj instanceof Employee) {
             Employee other = (Employee) obj;
 
-            equal = (empID.equals(other.getEmpID()) &&
-                    lName.equals(other.getlName()) &&
-                    fName.equals(other.getfName()) &&
-                    salary == other.getSalary() &&
-                    street.equals(other.getStreet()) &&
-                    city.equals(other.getCity()) &&
-                    state.equals(other.getState()) &&
-                    zip.equals(other.getZip()) &&
-                    revnum == other.getRevnum());
+            equal = (   empID.equals(other.getEmpID()) &&
+                        lName.equals(other.getlName()) &&
+                        fName.equals(other.getfName()) &&
+                        salary == other.getSalary() &&
+                        street.equals(other.getStreet()) &&
+                        city.equals(other.getCity()) &&
+                        state.equals(other.getState()) &&
+                        zip.equals(other.getZip()) &&
+                        revnum == other.getRevnum());
         }
 
         return equal;
