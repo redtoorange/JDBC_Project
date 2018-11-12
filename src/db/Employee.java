@@ -2,9 +2,7 @@ package db;
 
 import java.util.Objects;
 
-/**
- * Employee is a purely data class that contains the column data of a row from the EMP table.
- */
+/** Employee is a purely data class that contains the column data of a row from the EMP table. */
 public class Employee {
     // Database specific column length restrictions
     public static final int EMPID_LENGTH = 3;

@@ -13,39 +13,26 @@ import javafx.scene.control.TextField;
  * Controller class for the MainView.  This class handles communication with the DB through the Factory class.  The
  * only data model manipulated is an Employee.  Basic flow is the user specifies an EmployeeID, which is used to query
  * the DB.  The data is brought back as an Employee object then parsed into the View's textfields.  The user modifies
- * the texrfields and clicks save, which will send the data back to the DB as an update.
+ * the textfields and clicks save, which will send the data back to the DB as an update.
  */
 public class MainViewController {
     private AppState currentState = AppState.CLEAR;
     private Employee currentEmployeeData;
-    @FXML
-    private TextField fNameField;
-    @FXML
-    private TextField lNameField;
-    @FXML
-    private TextField salaryField;
-    @FXML
-    private TextField streetField;
-    @FXML
-    private TextField cityField;
-    @FXML
-    private TextField stateField;
-    @FXML
-    private TextField zipField;
-    @FXML
-    private TextField revNumField;
-    @FXML
-    private TextField empIDField;
-    @FXML
-    private Button saveButton;
-    @FXML
-    private Button loadButton;
-    @FXML
-    private Button clearButton;
 
-    /**
-     * Setup the GUI for first use.
-     */
+    @FXML private TextField fNameField;
+    @FXML private TextField lNameField;
+    @FXML private TextField salaryField;
+    @FXML private TextField streetField;
+    @FXML private TextField cityField;
+    @FXML private TextField stateField;
+    @FXML private TextField zipField;
+    @FXML private TextField revNumField;
+    @FXML private TextField empIDField;
+    @FXML private Button saveButton;
+    @FXML private Button loadButton;
+    @FXML private Button clearButton;
+
+    /** Setup the GUI for first use. */
     @FXML
     public void initialize() {
         installValidators();
@@ -64,15 +51,10 @@ public class MainViewController {
     private void onSaveClicked( ActionEvent event ) {
         Employee newEmployeeData = getEmployeeFromFields();
 
-        // If we have a valid employee try to save it
         if( newEmployeeData != null ) {
-            // There were no changes, should ignore save request
             if( currentEmployeeData.equals( newEmployeeData ) ) {
                 displayMessage( "No Changes", "Not Data Changes", "The data in the form has not been altered, ignoring save request." );
-                return;
             }
-
-            // Have the factory attempt to write the new data
             else {
                 String result = Factory.saveEmployee( newEmployeeData );
 
@@ -157,14 +139,14 @@ public class MainViewController {
         changeButtonState( AppState.CLEAR );
 
         currentEmployeeData = null;
-        fNameField.setText( "" );
-        lNameField.setText( "" );
-        salaryField.setText( "" );
-        streetField.setText( "" );
-        cityField.setText( "" );
-        stateField.setText( "" );
-        zipField.setText( "" );
-        revNumField.setText( "" );
+        fNameField.clear();
+        lNameField.clear();
+        salaryField.clear();
+        streetField.clear();
+        cityField.clear();
+        stateField.clear();
+        zipField.clear();
+        revNumField.clear();
     }
 
     /**
@@ -237,10 +219,7 @@ public class MainViewController {
         currentState = newState;
     }
 
-    /**
-     * Install some very simple length restrictions to the text fields.  For fields that should only take a number,
-     * disallow letter input.
-     */
+    /** Install some simple length/input restrictions to the text fields. */
     private void installValidators() {
         empIDField.setOnKeyTyped( event -> {
             if( empIDField.getText().length() >= Employee.EMPID_LENGTH ) {
@@ -291,13 +270,8 @@ public class MainViewController {
         } );
     }
 
-    /**
-     * Enum to represent the state if the application.  Right now only two states, either an Employee is loaded or one
-     * is not.
-     */
+    /** Enum to represent the state if the application. */
     private enum AppState {
         CLEAR, LOADED
     }
-
-
 }

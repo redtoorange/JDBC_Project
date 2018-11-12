@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+/** The ApplicationController is responsible for loading the View and connecting it to the Controller. */
 public class ApplicationController extends Application {
     @Override
     public void start( Stage primaryStage ) throws Exception {

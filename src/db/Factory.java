@@ -2,8 +2,8 @@ package db;
 
 import java.sql.*;
 
+/** The Factory class is responsible for handling all communication between the Application and the database. */
 public class Factory {
-    // DB Config options
     private static final String USERNAME = "amcguiness";
     private static final String PASSWORD = "orange";
 
@@ -14,9 +14,10 @@ public class Factory {
      */
     public static Employee getEmployee( String empID ) {
         Employee employee = null;
+        Connection conn = null;
 
         try {
-            Connection conn = DriverManager.getConnection( "jdbc:oracle:thin:@Picard2:1521:itec2", USERNAME, PASSWORD );
+            conn = DriverManager.getConnection( "jdbc:oracle:thin:@Picard2:1521:itec2", USERNAME, PASSWORD );
 
             CallableStatement statement = conn.prepareCall( "SELECT * FROM EMPS WHERE empid=?" );
             statement.setString( 1, empID );
@@ -36,14 +37,22 @@ public class Factory {
                         rset.getInt( "REVNUM" )
                 );
             }
-
-            conn.close();
         }
         catch( SQLException e ) {
             System.err.println( "Could not load the db" + e );
         }
         catch( LengthException le ) {
             System.err.println( "Issue with field lengths." + le );
+        }
+        finally {
+            try {
+                if( conn != null ) {
+                    conn.close();
+                }
+            }
+            catch( SQLException e ) {
+                e.printStackTrace();
+            }
         }
 
         return employee;
@@ -125,7 +134,7 @@ public class Factory {
     private static int getRevNumWithLock( Connection conn, String empID ) throws SQLException {
         int revnum = -1;
 
-        CallableStatement statement = conn.prepareCall( "SELECT revnum FROM EMPS WHERE empid=? FOR UPDATE WAIT 5" );
+        CallableStatement statement = conn.prepareCall( "SELECT revnum FROM EMPS WHERE empid=? FOR UPDATE NOWAIT" );
         statement.setString( 1, empID );
 
         ResultSet rset = statement.executeQuery();
