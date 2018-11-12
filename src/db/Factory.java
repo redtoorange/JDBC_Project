@@ -1,11 +1,31 @@
 package db;
 
+import java.io.File;
 import java.sql.*;
+import java.util.Scanner;
 
 /** The Factory class is responsible for handling all communication between the Application and the database. */
 public class Factory {
-    private static final String USERNAME = "amcguiness";
-    private static final String PASSWORD = "orange";
+    private static String SERVER = "";
+    private static String USERNAME = "";
+    private static String PASSWORD = "";
+
+
+    private static void loadSettings(){
+        try{
+            Scanner fileScanner = new Scanner( new File(Factory.class.getResource( "db_settings.ini").toURI()) );
+            fileScanner.useDelimiter( "\\s" );
+            if(fileScanner.hasNext()){
+                SERVER = fileScanner.nextLine();
+                USERNAME = fileScanner.nextLine();
+                PASSWORD = fileScanner.nextLine();
+            }
+            fileScanner.close();
+        }
+        catch(Exception e){
+            System.err.println("Error loading DB data from file.");
+        }
+    }
 
     /**
      * Read an employee from the database, parse the data from it and insert into an Employee object.
@@ -13,11 +33,15 @@ public class Factory {
      * @return The Employee containing the row information or null if not found.
      */
     public static Employee getEmployee( String empID ) {
+        if(SERVER.isEmpty()){
+            loadSettings();
+        }
+
         Employee employee = null;
         Connection conn = null;
 
         try {
-            conn = DriverManager.getConnection( "jdbc:oracle:thin:@Picard2:1521:itec2", USERNAME, PASSWORD );
+            conn = DriverManager.getConnection( SERVER, USERNAME, PASSWORD );
 
             CallableStatement statement = conn.prepareCall( "SELECT * FROM EMPS WHERE empid=?" );
             statement.setString( 1, empID );
@@ -64,6 +88,10 @@ public class Factory {
      * @return String containing the results of the transaction.  "SUCCESS" of there were no errors.
      */
     public static String saveEmployee( Employee employee ) {
+        if(SERVER.isEmpty()){
+            loadSettings();
+        }
+
         Connection conn = null;
         String result;
 
